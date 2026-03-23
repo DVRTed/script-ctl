@@ -396,7 +396,6 @@ mw.loader.using([
 		}, [["__scopeId", "data-v-e58ee679"]]);
 		//#endregion
 		//#region src/script_store.js
-		var BLOCK_START = "/* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!*/";
 		var BLOCK_RE = /\/\* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!\*\/([\s\S]*?)\/\* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!\*\//;
 		var COMMON_JS = "User:" + mw.config.get("wgUserName") + "/common.js";
 		var SCRIPT_TAG = " (using [[User:DVRTed/script-ctl.js|script-ctl]])";
@@ -414,7 +413,8 @@ mw.loader.using([
 				const match = page.revisions[0].slots.main.content.match(BLOCK_RE);
 				if (!match) return [];
 				try {
-					return JSON.parse(match[1].trim());
+					const match_without_comments = match[1].replace(/^\s*\/\/.*$/gm, "");
+					return JSON.parse(match_without_comments.trim());
 				} catch {
 					return [];
 				}
@@ -430,7 +430,7 @@ mw.loader.using([
 					formatversion: 2
 				})).query.pages[0];
 				const old_content = page.missing ? "" : page.revisions[0].slots.main.content;
-				const block = BLOCK_START + "\n" + JSON.stringify(list, null, "	") + "\n/* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!*/";
+				const block = `/* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!*/\n// Backlinks: ${list.map((item) => `[[${item.pagename}]]`).join(", ")}\n${JSON.stringify(list, null, "	")}\n/* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!*/`;
 				const new_content = old_content.match(BLOCK_RE) ? old_content.replace(BLOCK_RE, block) : old_content + (old_content ? "\n\n" : "") + block;
 				return api.postWithToken("csrf", {
 					action: "edit",

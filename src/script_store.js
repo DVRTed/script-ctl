@@ -21,7 +21,8 @@ export const script_store = {
     const match = content.match(BLOCK_RE);
     if (!match) return [];
     try {
-      return JSON.parse(match[1].trim());
+      const match_without_comments = match[1].replace(/^\s*\/\/.*$/gm, "");
+      return JSON.parse(match_without_comments.trim());
     } catch {
       return [];
     }
@@ -41,8 +42,11 @@ export const script_store = {
     const old_content = page.missing
       ? ""
       : page.revisions[0].slots.main.content;
+    const backlinks = list.map((item) => `[[${item.pagename}]]`).join(", ");
     const block =
-      BLOCK_START + "\n" + JSON.stringify(list, null, "\t") + "\n" + BLOCK_END;
+      BLOCK_START +
+      `\n// Backlinks: ${backlinks}\n${JSON.stringify(list, null, "\t")}\n` +
+      BLOCK_END;
     const new_content = old_content.match(BLOCK_RE)
       ? old_content.replace(BLOCK_RE, block)
       : old_content + (old_content ? "\n\n" : "") + block;

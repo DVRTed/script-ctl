@@ -60,8 +60,8 @@ const pending_action = ref({ type: 'install', name: '', idx: null, oldid: null }
 const busy_idx = ref(null);
 const loading = ref(false);
 const scripts = ref([]);
-const updates = ref([]);
-const timestamps = ref([]);
+const updates = ref({});
+const timestamps = ref({});
 
 const current_view = ref('list');
 const install_form_ref = ref(null);
@@ -93,51 +93,52 @@ const clear_notice = () => {
 };
 
 const check_updates_and_timestamps = async (all_scripts) => {
-  console.log(all_scripts);
-
   const current_scripts = all_scripts.filter(s => s.status === "enabled");
   if (!current_scripts.length) return;
-  updates.value = new Array(current_scripts.length).fill(false);
-  timestamps.value = new Array(current_scripts.length).fill(null);
 
-  const oldids = current_scripts.map(s => s.oldid);
-  for (let i = 0; i < oldids.length; i += 50) {
-    const chunk = oldids.slice(i, i + 50);
-    try {
-      const data2 = await new mw.Api().get({
-        action: "query",
-        prop: "revisions",
-        revids: chunk.join("|"),
-        rvprop: "timestamp|ids",
-        formatversion: 2,
-      });
-      const ts_map = {};
-      for (const page of data2.query.pages || []) {
-        for (const rev of page.revisions || []) {
-          ts_map[rev.revid] = new Date(rev.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  const new_updates = {};
+  const new_timestamps = {};
+
+  const oldids = current_scripts.map(s => s.oldid).filter(id => id);
+  if (oldids.length > 0) {
+    for (let i = 0; i < oldids.length; i += 50) {
+      const chunk = oldids.slice(i, i + 50);
+      try {
+        const data2 = await new mw.Api().get({
+          action: "query",
+          prop: "revisions",
+          revids: chunk.join("|"),
+          rvprop: "timestamp|ids",
+          formatversion: 2,
+        });
+        for (const page of data2.query.pages || []) {
+          for (const rev of page.revisions || []) {
+            const ts = new Date(rev.timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+            const script = current_scripts.find(s => s.oldid === rev.revid);
+            if (script) {
+              new_timestamps[script.pagename] = ts;
+            }
+          }
         }
-      }
-      for (let idx = 0; idx < current_scripts.length; idx++) {
-        if (ts_map[current_scripts[idx].oldid]) {
-          timestamps.value[idx] = ts_map[current_scripts[idx].oldid];
-        }
-      }
-    } catch (e) { }
+      } catch (e) { }
+    }
   }
 
   const pagenames = current_scripts.map(s => s.pagename);
   try {
     const latest_map = await fetch_latest_revisions(pagenames);
-    for (let idx = 0; idx < current_scripts.length; idx++) {
-      const s = current_scripts[idx];
+    for (const s of current_scripts) {
       const latest = latest_map[s.pagename];
       if (latest && latest !== s.oldid) {
-        updates.value[idx] = true;
+        new_updates[s.pagename] = true;
       }
     }
   } catch (e) {
     console.error("Failed to check for updates", e);
   }
+
+  updates.value = new_updates;
+  timestamps.value = new_timestamps;
 };
 
 const render_list = async () => {

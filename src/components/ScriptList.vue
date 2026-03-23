@@ -25,7 +25,7 @@
             <a :href="get_url(s.pagename, s.oldid)" target="_blank" class="smgr-pagename">
               {{ s.pagename }}
             </a>
-            <span v-if="updates[idx]" class="smgr-update-chip">
+            <span v-if="updates[s.pagename]" class="smgr-update-chip">
               <cdx-icon :icon="cdxIconAlert" />
               Update available
             </span>
@@ -35,7 +35,7 @@
             <span
               :class="['smgr-status-text', s.status === 'enabled' ? 'smgr-status-text--on' : 'smgr-status-text--off']">{{
                 s.status === 'enabled' ? 'Enabled' : 'Disabled' }}</span>
-            <template v-if="timestamps[idx]"> · version dated <b>{{ timestamps[idx] }}</b></template>
+            <template v-if="timestamps[s.pagename]"> · version dated <b>{{ timestamps[s.pagename] }}</b></template>
             <template v-if="s.oldid"> (rev {{ s.oldid }})</template>
           </p>
         </div>
@@ -65,8 +65,8 @@ import {
 
 const props = defineProps({
   scripts: { type: Array, required: true },
-  updates: { type: Array, required: true },
-  timestamps: { type: Array, default: () => [] },
+  updates: { type: Object, required: true },
+  timestamps: { type: Object, default: () => ({}) },
   loading: { type: Boolean, required: true },
   busy_idx: { type: Number, default: null },
 });
@@ -79,7 +79,7 @@ function get_menu_items(s, idx) {
       label: 'Update',
       value: 'update',
       icon: cdxIconReload,
-      disabled: !props.updates[idx],
+      disabled: !props.updates[s.pagename],
     },
     {
       label: s.status === 'enabled' ? 'Disable' : 'Enable',

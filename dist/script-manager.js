@@ -293,12 +293,12 @@ mw.loader.using([
 					required: true
 				},
 				updates: {
-					type: Array,
+					type: Object,
 					required: true
 				},
 				timestamps: {
-					type: Array,
-					default: () => []
+					type: Object,
+					default: () => ({})
 				},
 				loading: {
 					type: Boolean,
@@ -324,7 +324,7 @@ mw.loader.using([
 							label: "Update",
 							value: "update",
 							icon: W7,
-							disabled: !props.updates[idx]
+							disabled: !props.updates[s.pagename]
 						},
 						{
 							label: s.status === "enabled" ? "Disable" : "Enable",
@@ -369,9 +369,9 @@ mw.loader.using([
 								href: get_url(s.pagename, s.oldid),
 								target: "_blank",
 								class: "smgr-pagename"
-							}, (0, vue.toDisplayString)(s.pagename), 9, _hoisted_8), __props.updates[idx] ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("span", _hoisted_9, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxIcon), { icon: (0, vue.unref)(F3) }, null, 8, ["icon"]), _cache[3] || (_cache[3] = (0, vue.createTextVNode)(" Update available ", -1))])) : (0, vue.createCommentVNode)("", true)]), (0, vue.createElementVNode)("p", _hoisted_10, [
+							}, (0, vue.toDisplayString)(s.pagename), 9, _hoisted_8), __props.updates[s.pagename] ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("span", _hoisted_9, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxIcon), { icon: (0, vue.unref)(F3) }, null, 8, ["icon"]), _cache[3] || (_cache[3] = (0, vue.createTextVNode)(" Update available ", -1))])) : (0, vue.createCommentVNode)("", true)]), (0, vue.createElementVNode)("p", _hoisted_10, [
 								(0, vue.createElementVNode)("span", { class: (0, vue.normalizeClass)(["smgr-status-text", s.status === "enabled" ? "smgr-status-text--on" : "smgr-status-text--off"]) }, (0, vue.toDisplayString)(s.status === "enabled" ? "Enabled" : "Disabled"), 3),
-								__props.timestamps[idx] ? ((0, vue.openBlock)(), (0, vue.createElementBlock)(vue.Fragment, { key: 0 }, [_cache[4] || (_cache[4] = (0, vue.createTextVNode)(" · version dated ", -1)), (0, vue.createElementVNode)("b", null, (0, vue.toDisplayString)(__props.timestamps[idx]), 1)], 64)) : (0, vue.createCommentVNode)("", true),
+								__props.timestamps[s.pagename] ? ((0, vue.openBlock)(), (0, vue.createElementBlock)(vue.Fragment, { key: 0 }, [_cache[4] || (_cache[4] = (0, vue.createTextVNode)(" · version dated ", -1)), (0, vue.createElementVNode)("b", null, (0, vue.toDisplayString)(__props.timestamps[s.pagename]), 1)], 64)) : (0, vue.createCommentVNode)("", true),
 								s.oldid ? ((0, vue.openBlock)(), (0, vue.createElementBlock)(vue.Fragment, { key: 1 }, [(0, vue.createTextVNode)(" (rev " + (0, vue.toDisplayString)(s.oldid) + ")", 1)], 64)) : (0, vue.createCommentVNode)("", true)
 							])]),
 							(0, vue.createElementVNode)("div", _hoisted_11, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxMenuButton), {
@@ -393,7 +393,7 @@ mw.loader.using([
 					}), 128))]))]);
 				};
 			}
-		}, [["__scopeId", "data-v-e58ee679"]]);
+		}, [["__scopeId", "data-v-08216051"]]);
 		//#endregion
 		//#region src/script_store.js
 		var BLOCK_RE = /\/\* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!\*\/([\s\S]*?)\/\* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!\*\//;
@@ -499,8 +499,8 @@ mw.loader.using([
 				const busy_idx = (0, vue.ref)(null);
 				const loading = (0, vue.ref)(false);
 				const scripts = (0, vue.ref)([]);
-				const updates = (0, vue.ref)([]);
-				const timestamps = (0, vue.ref)([]);
+				const updates = (0, vue.ref)({});
+				const timestamps = (0, vue.ref)({});
 				const current_view = (0, vue.ref)("list");
 				const install_form_ref = (0, vue.ref)(null);
 				const open = () => {
@@ -530,13 +530,12 @@ mw.loader.using([
 					set_notice("");
 				};
 				const check_updates_and_timestamps = async (all_scripts) => {
-					console.log(all_scripts);
 					const current_scripts = all_scripts.filter((s) => s.status === "enabled");
 					if (!current_scripts.length) return;
-					updates.value = new Array(current_scripts.length).fill(false);
-					timestamps.value = new Array(current_scripts.length).fill(null);
-					const oldids = current_scripts.map((s) => s.oldid);
-					for (let i = 0; i < oldids.length; i += 50) {
+					const new_updates = {};
+					const new_timestamps = {};
+					const oldids = current_scripts.map((s) => s.oldid).filter((id) => id);
+					if (oldids.length > 0) for (let i = 0; i < oldids.length; i += 50) {
 						const chunk = oldids.slice(i, i + 50);
 						try {
 							const data2 = await new mw.Api().get({
@@ -546,26 +545,29 @@ mw.loader.using([
 								rvprop: "timestamp|ids",
 								formatversion: 2
 							});
-							const ts_map = {};
-							for (const page of data2.query.pages || []) for (const rev of page.revisions || []) ts_map[rev.revid] = new Date(rev.timestamp).toLocaleDateString(void 0, {
-								year: "numeric",
-								month: "short",
-								day: "numeric"
-							});
-							for (let idx = 0; idx < current_scripts.length; idx++) if (ts_map[current_scripts[idx].oldid]) timestamps.value[idx] = ts_map[current_scripts[idx].oldid];
+							for (const page of data2.query.pages || []) for (const rev of page.revisions || []) {
+								const ts = new Date(rev.timestamp).toLocaleDateString(void 0, {
+									year: "numeric",
+									month: "short",
+									day: "numeric"
+								});
+								const script = current_scripts.find((s) => s.oldid === rev.revid);
+								if (script) new_timestamps[script.pagename] = ts;
+							}
 						} catch (e) {}
 					}
 					const pagenames = current_scripts.map((s) => s.pagename);
 					try {
 						const latest_map = await fetch_latest_revisions(pagenames);
-						for (let idx = 0; idx < current_scripts.length; idx++) {
-							const s = current_scripts[idx];
+						for (const s of current_scripts) {
 							const latest = latest_map[s.pagename];
-							if (latest && latest !== s.oldid) updates.value[idx] = true;
+							if (latest && latest !== s.oldid) new_updates[s.pagename] = true;
 						}
 					} catch (e) {
 						console.error("Failed to check for updates", e);
 					}
+					updates.value = new_updates;
+					timestamps.value = new_timestamps;
 				};
 				const render_list = async () => {
 					loading.value = true;
@@ -753,7 +755,7 @@ mw.loader.using([
 					}, 8, ["open"])], 64);
 				};
 			}
-		}, [["__scopeId", "data-v-bf3901e6"]]);
+		}, [["__scopeId", "data-v-524db364"]]);
 		//#endregion
 		//#region src/init.js
 		async function init() {
@@ -781,7 +783,7 @@ mw.loader.using([
 	try {
 		if (typeof document != "undefined") {
 			var elementStyle = document.createElement("style");
-			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-header[data-v-c9d3050c] {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  border-bottom: 1px solid #eaecf0;\n  padding-bottom: 12px;\n}\n.smgr-header h3[data-v-c9d3050c] {\n  margin: 0;\n  padding: 0;\n  font-size: 1.2em;\n  font-weight: bold;\n}\n.smgr-card[data-v-c9d3050c] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-c9d3050c] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-c9d3050c] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-c9d3050c] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-c9d3050c] {\n  flex: 1;\n}\n.smgr-examples-card[data-v-c9d3050c] {\n  background: #f8f9fa;\n  border-color: #eaecf0;\n  display: flex;\n  flex-direction: column;\n}\n.skin-theme-clientpref-night .smgr-examples-card[data-v-c9d3050c] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-examples-title[data-v-c9d3050c] {\n  margin: 0 0 10px 0;\n  font-size: 0.95em;\n}\n.smgr-browse-loading[data-v-c9d3050c] {\n  font-size: 0.9em;\n  color: #72777d;\n  font-style: italic;\n  padding: 10px 0;\n}\n.smgr-browse-list-container[data-v-c9d3050c] {\n  height: 250px;\n  overflow-y: auto;\n  border: 1px solid #eaecf0;\n  border-radius: 4px;\n  background: #fff;\n}\n.skin-theme-clientpref-night .smgr-browse-list-container[data-v-c9d3050c] {\n  background: #141414;\n  border-color: #54595d;\n}\n.smgr-example-list[data-v-c9d3050c] {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n}\n.smgr-browse-item[data-v-c9d3050c] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 10px 12px;\n  border-bottom: 1px solid #eaecf0;\n  gap: 12px;\n}\n.smgr-browse-item[data-v-c9d3050c]:last-child {\n  border-bottom: none;\n}\n.smgr-browse-item[data-v-c9d3050c]:hover {\n  background: #f8f9fa;\n}\n.skin-theme-clientpref-night .smgr-browse-item[data-v-c9d3050c]:hover {\n  background: #1a1a1a;\n}\n.smgr-browse-info[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n}\n.smgr-browse-info strong[data-v-c9d3050c] {\n  font-size: 0.95em;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.smgr-browse-info strong a[data-v-c9d3050c] {\n  color: #0645ad;\n  text-decoration: none;\n}\n.skin-theme-clientpref-night .smgr-browse-info strong a[data-v-c9d3050c] {\n  color: #4e94ce;\n}\n.smgr-browse-info strong a[data-v-c9d3050c]:hover {\n  text-decoration: underline;\n}\n.smgr-browse-author[data-v-c9d3050c] {\n  font-size: 0.9em;\n  font-weight: normal;\n}\n.smgr-browse-desc[data-v-c9d3050c] {\n  font-size: 0.85em;\n  line-height: 1.3;\n}\n.smgr-install-btn[data-v-c9d3050c] {\n  flex-shrink: 0;\n}\n\n.smgr-scripts-view[data-v-e58ee679] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 0;\n}\n.smgr-header[data-v-e58ee679] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  padding-bottom: 12px;\r\n  margin-bottom: 4px;\r\n  border-bottom: 1px solid #eaecf0;\n}\n.smgr-header-title[data-v-e58ee679] {\r\n  font-size: 1em;\r\n  font-weight: 600;\n}\n.smgr-state[data-v-e58ee679] {\r\n  padding: 24px 0;\r\n  text-align: center;\n}\n.smgr-empty[data-v-e58ee679] {\r\n  color: #72777d;\r\n  font-size: 0.9em;\r\n  font-style: italic;\n}\n.smgr-list[data-v-e58ee679] {\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-row[data-v-e58ee679] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 12px;\r\n  padding: 10px 12px 10px 0;\r\n  border-bottom: 1px solid #eaecf0;\r\n  transition: background 0.1s ease;\n}\n.smgr-row[data-v-e58ee679]:last-child {\r\n  border-bottom: none;\n}\n.smgr-row[data-v-e58ee679]:hover {\r\n  background: #f8f9fa;\n}\n.skin-theme-clientpref-night .smgr-row[data-v-e58ee679]:hover {\r\n  background: #1a1a1a;\n}\n.smgr-row--disabled .smgr-row-body[data-v-e58ee679] {\r\n  opacity: 0.45;\n}\n.smgr-stripe[data-v-e58ee679] {\r\n  flex-shrink: 0;\r\n  width: 3px;\r\n  align-self: stretch;\r\n  border-radius: 0 2px 2px 0;\n}\n.smgr-stripe--on[data-v-e58ee679] {\r\n  background: #14866d;\n}\n.smgr-stripe--off[data-v-e58ee679] {\r\n  background: #c8ccd1;\n}\n.smgr-row-body[data-v-e58ee679] {\r\n  flex: 1;\r\n  min-width: 0;\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 2px;\n}\n.smgr-row-top[data-v-e58ee679] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  flex-wrap: wrap;\n}\n.smgr-pagename[data-v-e58ee679] {\r\n  font-size: 0.95em;\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\r\n  overflow-wrap: anywhere;\n}\n.smgr-pagename[data-v-e58ee679]:hover {\r\n  text-decoration: underline;\n}\n.smgr-meta[data-v-e58ee679] {\r\n  margin: 0;\r\n  font-size: 0.78em;\r\n  color: #72777d;\r\n  letter-spacing: 0.01em;\n}\n.smgr-status-text[data-v-e58ee679] {\r\n  font-weight: 600;\n}\n.smgr-status-text--on[data-v-e58ee679] {\r\n  color: #14866d;\n}\n.smgr-status-text--off[data-v-e58ee679] {\r\n  color: #72777d;\n}\n.smgr-update-chip[data-v-e58ee679] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\r\n  white-space: nowrap;\n}\n.smgr-update-chip .cdx-icon[data-v-e58ee679] {\r\n  width: 12px;\r\n  height: 12px;\n}\n.smgr-row-actions[data-v-e58ee679] {\r\n  flex-shrink: 0;\n}\r\n\n.smgr-body[data-v-bf3901e6] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\r\n  min-height: 500px;\n}\n.smgr-notice[data-v-bf3901e6] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-bf3901e6] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-bf3901e6] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-bf3901e6] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-bf3901e6] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
+			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-header[data-v-c9d3050c] {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  border-bottom: 1px solid #eaecf0;\n  padding-bottom: 12px;\n}\n.smgr-header h3[data-v-c9d3050c] {\n  margin: 0;\n  padding: 0;\n  font-size: 1.2em;\n  font-weight: bold;\n}\n.smgr-card[data-v-c9d3050c] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-c9d3050c] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-c9d3050c] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-c9d3050c] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-c9d3050c] {\n  flex: 1;\n}\n.smgr-examples-card[data-v-c9d3050c] {\n  background: #f8f9fa;\n  border-color: #eaecf0;\n  display: flex;\n  flex-direction: column;\n}\n.skin-theme-clientpref-night .smgr-examples-card[data-v-c9d3050c] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-examples-title[data-v-c9d3050c] {\n  margin: 0 0 10px 0;\n  font-size: 0.95em;\n}\n.smgr-browse-loading[data-v-c9d3050c] {\n  font-size: 0.9em;\n  color: #72777d;\n  font-style: italic;\n  padding: 10px 0;\n}\n.smgr-browse-list-container[data-v-c9d3050c] {\n  height: 250px;\n  overflow-y: auto;\n  border: 1px solid #eaecf0;\n  border-radius: 4px;\n  background: #fff;\n}\n.skin-theme-clientpref-night .smgr-browse-list-container[data-v-c9d3050c] {\n  background: #141414;\n  border-color: #54595d;\n}\n.smgr-example-list[data-v-c9d3050c] {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n}\n.smgr-browse-item[data-v-c9d3050c] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 10px 12px;\n  border-bottom: 1px solid #eaecf0;\n  gap: 12px;\n}\n.smgr-browse-item[data-v-c9d3050c]:last-child {\n  border-bottom: none;\n}\n.smgr-browse-item[data-v-c9d3050c]:hover {\n  background: #f8f9fa;\n}\n.skin-theme-clientpref-night .smgr-browse-item[data-v-c9d3050c]:hover {\n  background: #1a1a1a;\n}\n.smgr-browse-info[data-v-c9d3050c] {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n}\n.smgr-browse-info strong[data-v-c9d3050c] {\n  font-size: 0.95em;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.smgr-browse-info strong a[data-v-c9d3050c] {\n  color: #0645ad;\n  text-decoration: none;\n}\n.skin-theme-clientpref-night .smgr-browse-info strong a[data-v-c9d3050c] {\n  color: #4e94ce;\n}\n.smgr-browse-info strong a[data-v-c9d3050c]:hover {\n  text-decoration: underline;\n}\n.smgr-browse-author[data-v-c9d3050c] {\n  font-size: 0.9em;\n  font-weight: normal;\n}\n.smgr-browse-desc[data-v-c9d3050c] {\n  font-size: 0.85em;\n  line-height: 1.3;\n}\n.smgr-install-btn[data-v-c9d3050c] {\n  flex-shrink: 0;\n}\n\n.smgr-scripts-view[data-v-08216051] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 0;\n}\n.smgr-header[data-v-08216051] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  padding-bottom: 12px;\r\n  margin-bottom: 4px;\r\n  border-bottom: 1px solid #eaecf0;\n}\n.smgr-header-title[data-v-08216051] {\r\n  font-size: 1em;\r\n  font-weight: 600;\n}\n.smgr-state[data-v-08216051] {\r\n  padding: 24px 0;\r\n  text-align: center;\n}\n.smgr-empty[data-v-08216051] {\r\n  color: #72777d;\r\n  font-size: 0.9em;\r\n  font-style: italic;\n}\n.smgr-list[data-v-08216051] {\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-row[data-v-08216051] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 12px;\r\n  padding: 10px 12px 10px 0;\r\n  border-bottom: 1px solid #eaecf0;\r\n  transition: background 0.1s ease;\n}\n.smgr-row[data-v-08216051]:last-child {\r\n  border-bottom: none;\n}\n.smgr-row[data-v-08216051]:hover {\r\n  background: #f8f9fa;\n}\n.skin-theme-clientpref-night .smgr-row[data-v-08216051]:hover {\r\n  background: #1a1a1a;\n}\n.smgr-row--disabled .smgr-row-body[data-v-08216051] {\r\n  opacity: 0.45;\n}\n.smgr-stripe[data-v-08216051] {\r\n  flex-shrink: 0;\r\n  width: 3px;\r\n  align-self: stretch;\r\n  border-radius: 0 2px 2px 0;\n}\n.smgr-stripe--on[data-v-08216051] {\r\n  background: #14866d;\n}\n.smgr-stripe--off[data-v-08216051] {\r\n  background: #c8ccd1;\n}\n.smgr-row-body[data-v-08216051] {\r\n  flex: 1;\r\n  min-width: 0;\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 2px;\n}\n.smgr-row-top[data-v-08216051] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  flex-wrap: wrap;\n}\n.smgr-pagename[data-v-08216051] {\r\n  font-size: 0.95em;\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\r\n  overflow-wrap: anywhere;\n}\n.smgr-pagename[data-v-08216051]:hover {\r\n  text-decoration: underline;\n}\n.smgr-meta[data-v-08216051] {\r\n  margin: 0;\r\n  font-size: 0.78em;\r\n  color: #72777d;\r\n  letter-spacing: 0.01em;\n}\n.smgr-status-text[data-v-08216051] {\r\n  font-weight: 600;\n}\n.smgr-status-text--on[data-v-08216051] {\r\n  color: #14866d;\n}\n.smgr-status-text--off[data-v-08216051] {\r\n  color: #72777d;\n}\n.smgr-update-chip[data-v-08216051] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\r\n  white-space: nowrap;\n}\n.smgr-update-chip .cdx-icon[data-v-08216051] {\r\n  width: 12px;\r\n  height: 12px;\n}\n.smgr-row-actions[data-v-08216051] {\r\n  flex-shrink: 0;\n}\r\n\n.smgr-body[data-v-524db364] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\r\n  min-height: 500px;\n}\n.smgr-notice[data-v-524db364] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-524db364] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-524db364] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-524db364] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-524db364] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
 			document.head.appendChild(elementStyle);
 		}
 	} catch (e) {

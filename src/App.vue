@@ -1,6 +1,6 @@
 <template>
-  <cdx_dialog v-model:open="is_open" class="smgr-dialog" title="Script Manager" close-button-label="Close"
-    @update:open="on_dialog_update">
+  <cdx_dialog v-model:open="is_open" class="smgr-dialog" title="script-ctl"
+    subtitle="A security-focused user script manager" close-button-label="Close" @update:open="on_dialog_update">
     <div class="smgr-body">
       <div v-if="notice.text" class="smgr-notice" :class="`smgr-notice--${notice.type}`">
         {{ notice.text }}

@@ -70,6 +70,10 @@ defineExpose({
     install_input.value = '';
     selected_script.value = null;
     suggestions.value = [];
+  },
+  set_input: (val) => {
+    install_input.value = val;
+    selected_script.value = null;
   }
 });
 </script>

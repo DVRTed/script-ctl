@@ -128,11 +128,17 @@ mw.loader.using([
 				const open_browse = () => {
 					window.open(mw.util.getUrl("Wikipedia:User scripts/List"), "_blank");
 				};
-				__expose({ clear_input: () => {
-					install_input.value = "";
-					selected_script.value = null;
-					suggestions.value = [];
-				} });
+				__expose({
+					clear_input: () => {
+						install_input.value = "";
+						selected_script.value = null;
+						suggestions.value = [];
+					},
+					set_input: (val) => {
+						install_input.value = val;
+						selected_script.value = null;
+					}
+				});
 				return (_ctx, _cache) => {
 					return (0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_1$2, [(0, vue.createElementVNode)("div", _hoisted_2$2, [
 						_cache[3] || (_cache[3] = (0, vue.createElementVNode)("label", { class: "smgr-label" }, "Script Page Name", -1)),
@@ -172,7 +178,7 @@ mw.loader.using([
 					])]);
 				};
 			}
-		}, [["__scopeId", "data-v-f6574ed7"]]);
+		}, [["__scopeId", "data-v-c419cbd9"]]);
 		//#endregion
 		//#region src/components/ScriptList.vue
 		var _hoisted_1$1 = { class: "smgr-scripts-view" };
@@ -450,7 +456,24 @@ mw.loader.using([
 					if (install_form_ref.value) install_form_ref.value.clear_input();
 					render_list();
 				};
-				__expose({ open });
+				const open_install = async (pagename) => {
+					notice.value = {
+						text: "",
+						type: "notice"
+					};
+					is_open.value = true;
+					current_view.value = "install";
+					if (pagename) {
+						on_install_requested(pagename);
+						await (0, vue.nextTick)();
+						if (install_form_ref.value) install_form_ref.value.set_input(pagename);
+					}
+					render_list();
+				};
+				__expose({
+					open,
+					open_install
+				});
 				const get_url = (pagename) => {
 					return mw.util.getUrl(pagename);
 				};
@@ -707,23 +730,42 @@ mw.loader.using([
 					}, 8, ["open"])], 64);
 				};
 			}
-		}, [["__scopeId", "data-v-9d8d6d44"]]);
+		}, [["__scopeId", "data-v-b005dffc"]]);
 		//#endregion
 		//#region src/init.js
 		async function init() {
 			(await script_store.load()).filter((s) => s.status === "enabled").forEach((s) => load_script(s.pagename, s.oldid));
 			let app_instance = null;
-			const link = mw.util.addPortletLink("p-personal", "#", "Script Manager", "pt-scriptmanager", "Install and manage userscripts");
-			if (!link) return;
-			link.addEventListener("click", (e) => {
-				e.preventDefault();
+			const ensure_app_instance = () => {
 				if (!app_instance) {
 					const app_mount = document.createElement("div");
 					app_mount.id = "script-manager-vue-root";
 					document.body.appendChild(app_mount);
 					app_instance = (0, vue.createApp)(App_default).mount(app_mount);
 				}
-				if (app_instance && typeof app_instance.open === "function") app_instance.open();
+				return app_instance;
+			};
+			const link = mw.util.addPortletLink("p-personal", "#", "Script Manager", "pt-scriptmanager", "Install and manage userscripts");
+			if (link) link.addEventListener("click", (e) => {
+				e.preventDefault();
+				const inst = ensure_app_instance();
+				if (inst && typeof inst.open === "function") inst.open();
+			});
+			if (mw.config.get("wgPageName") === "Wikipedia:User_scripts/List") document.querySelectorAll("span.scriptInstallerLink").forEach((span) => {
+				const id = span.id;
+				if (id && id.endsWith(".js")) {
+					const install_link = document.createElement("a");
+					install_link.textContent = " [install]";
+					install_link.href = "#";
+					install_link.style.cursor = "pointer";
+					install_link.className = "script-ctl-install-link";
+					install_link.addEventListener("click", (e) => {
+						e.preventDefault();
+						const inst = ensure_app_instance();
+						if (inst && typeof inst.open_install === "function") inst.open_install(id);
+					});
+					span.after(install_link);
+				}
 			});
 		}
 		init();
@@ -735,7 +777,7 @@ mw.loader.using([
 	try {
 		if (typeof document != "undefined") {
 			var elementStyle = document.createElement("style");
-			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-f6574ed7] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-f6574ed7] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-f6574ed7] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-f6574ed7] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-f6574ed7] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-f6574ed7] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-f6574ed7] {\n  flex: 1;\n}\n.smgr-browse-footer[data-v-f6574ed7] {\n  margin-top: 4px;\n  display: flex;\n  justify-content: flex-start;\n}\n\n.smgr-state[data-v-1b27191a] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: #72777d;\n}\n.smgr-script-cell[data-v-1b27191a] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-1b27191a] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-1b27191a] {\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-1b27191a]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-1b27191a] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-1b27191a] {\r\n  width: 12px;\r\n  height: 12px;\n}\r\n\n.smgr-body[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-9d8d6d44] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-9d8d6d44] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-9d8d6d44] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-9d8d6d44] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-9d8d6d44] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-9d8d6d44] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
+			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-c419cbd9] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-c419cbd9] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-c419cbd9] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-c419cbd9] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-c419cbd9] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-c419cbd9] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-c419cbd9] {\n  flex: 1;\n}\n.smgr-browse-footer[data-v-c419cbd9] {\n  margin-top: 4px;\n  display: flex;\n  justify-content: flex-start;\n}\n\n.smgr-state[data-v-1b27191a] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: #72777d;\n}\n.smgr-script-cell[data-v-1b27191a] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-1b27191a] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-1b27191a] {\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-1b27191a]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-1b27191a] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-1b27191a] {\r\n  width: 12px;\r\n  height: 12px;\n}\r\n\n.smgr-body[data-v-b005dffc] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-b005dffc] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-b005dffc] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-b005dffc] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-b005dffc] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-b005dffc] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-b005dffc] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-b005dffc] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-b005dffc] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-b005dffc] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
 			document.head.appendChild(elementStyle);
 		}
 	} catch (e) {

@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { CdxDialog as cdx_dialog, CdxButton as cdx_button, CdxIcon } from '@wikimedia/codex';
 import { cdxIconAdd, cdxIconPrevious } from '@wikimedia/codex-icons';
 
@@ -93,7 +93,21 @@ const open = () => {
   render_list();
 };
 
-defineExpose({ open });
+const open_install = async (pagename) => {
+  notice.value = { text: '', type: 'notice' };
+  is_open.value = true;
+  current_view.value = 'install';
+  if (pagename) {
+    on_install_requested(pagename);
+    await nextTick();
+    if (install_form_ref.value) {
+      install_form_ref.value.set_input(pagename);
+    }
+  }
+  render_list();
+};
+
+defineExpose({ open, open_install });
 
 const get_url = (pagename) => {
   return mw.util.getUrl(pagename);

@@ -12,7 +12,7 @@ export default define_config({
     lib: {
       entry: path.resolve(__dirname, "src/init.js"),
       name: "script_manager",
-      fileName: () => "script-manager.js",
+      fileName: () => "script-ctl.js",
       formats: ["iife"]
     },
     rollupOptions: {

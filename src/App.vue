@@ -1,6 +1,24 @@
 <template>
-  <cdx_dialog v-model:open="is_open" class="smgr-dialog" title="script-ctl"
-    subtitle="A security-focused user script manager" close-button-label="Close" @update:open="on_dialog_update">
+  <cdx_dialog v-model:open="is_open" class="smgr-dialog" close-button-label="Close" @update:open="on_dialog_update">
+    <template #header>
+      <div class="smgr-header-content" :class="{ 'smgr-header-content--install': current_view === 'install' }">
+        <div v-if="current_view === 'install'" class="smgr-header-nav">
+          <cdx_button @click="current_view = 'list'" action="progressive" weight="quiet" class="smgr-back-btn">
+            <cdx-icon :icon="cdxIconPrevious" />Back
+          </cdx_button>
+          <div class="smgr-header-text">
+            <span class="cdx-dialog__header__title">Install New Script</span>
+          </div>
+        </div>
+        <div v-else class="smgr-header-text">
+          <span class="cdx-dialog__header__title">script-ctl</span>
+          <span class="cdx-dialog__header__subtitle">A security-focused user script manager</span>
+        </div>
+        <cdx_button v-if="current_view === 'list'" action="progressive" weight="primary" @click="current_view = 'install'">
+          <cdx-icon :icon="cdxIconAdd" />Add script
+        </cdx_button>
+      </div>
+    </template>
     <div class="smgr-body">
       <div v-if="notice.text" class="smgr-notice" :class="`smgr-notice--${notice.type}`">
         {{ notice.text }}
@@ -44,7 +62,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import { CdxDialog as cdx_dialog, CdxButton as cdx_button } from '@wikimedia/codex';
+import { CdxDialog as cdx_dialog, CdxButton as cdx_button, CdxIcon } from '@wikimedia/codex';
+import { cdxIconAdd, cdxIconPrevious } from '@wikimedia/codex-icons';
 
 import install_form from './components/InstallForm.vue';
 import script_list from './components/ScriptList.vue';
@@ -282,7 +301,29 @@ const on_uninstall = async (idx) => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  min-height: 500px;
+}
+
+.smgr-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.smgr-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: -8px;
+}
+
+.smgr-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.smgr-header-content--install .cdx-dialog__header__title {
+  font-size: 1rem;
 }
 
 .smgr-notice {

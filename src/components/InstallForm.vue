@@ -1,11 +1,6 @@
 <template>
   <div class="smgr-install-view">
-    <div class="smgr-header">
-      <cdx_button @click="$emit('cancel')" action="progressive">
-        Back
-      </cdx_button>
-      <h3>Install New Script</h3>
-    </div>
+
 
     <div class="smgr-card smgr-install-card">
       <label class="smgr-label">Script Page Name</label>
@@ -114,20 +109,7 @@ defineExpose({
   gap: 16px;
 }
 
-.smgr-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid #eaecf0;
-  padding-bottom: 12px;
-}
 
-.smgr-header h3 {
-  margin: 0;
-  padding: 0;
-  font-size: 1.2em;
-  font-weight: bold;
-}
 
 .smgr-card {
   background: #fff;

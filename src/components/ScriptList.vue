@@ -1,66 +1,58 @@
 <template>
   <div class="smgr-scripts-view">
-    <div class="smgr-header">
-      <span class="smgr-header-title">Installed scripts</span>
-      <cdx-button action="progressive" weight="primary" @click="$emit('add_new')">
-        <cdx-icon :icon="cdxIconAdd" />
-        Add script
-      </cdx-button>
-    </div>
-
     <div v-if="loading" class="smgr-state">
       <cdx-progress-bar aria-label="Loading scripts..." />
     </div>
 
-    <div v-else-if="!scripts.length" class="smgr-state smgr-empty">
+    <cdx-table v-else caption="Installed scripts" :columns="columns" :data="tableData">
+
+
+      <template #item-script="{ row }">
+        <div :class="['smgr-script-cell', { 'smgr-dimmed': row.status === 'disabled' }]">
+          <span :class="['smgr-stripe', row.status === 'enabled' ? 'smgr-stripe--on' : 'smgr-stripe--off']" />
+          <a :href="get_url(row.pagename, row.oldid)" target="_blank" class="smgr-pagename">
+            {{ row.pagename }}
+          </a>
+          <span v-if="updates[row.pagename]" class="smgr-update-chip">
+            <cdx-icon :icon="cdxIconAlert" /> Update available
+          </span>
+        </div>
+      </template>
+
+      <template #item-status="{ row }">
+        <cdx-info-chip :status="row.status === 'enabled' ? 'success' : 'warning'">
+          {{ row.status === 'enabled' ? 'Enabled' : 'Disabled' }}
+        </cdx-info-chip>
+
+      </template>
+
+      <template #item-version="{ row }">
+        <template v-if="timestamps[row.pagename]">
+          {{ timestamps[row.pagename] }}<template v-if="row.oldid"> (rev {{ row.oldid }})</template>
+        </template>
+        <span v-else style="color: #72777d">—</span>
+      </template>
+
+      <template #item-actions="{ row }">
+        <cdx-menu-button :selected="null" :menu-items="get_menu_items(row)" :disabled="busy_idx === row._idx"
+          :aria-label="'Actions for ' + row.pagename" @update:selected="on_select($event, row._idx)">
+          <cdx-icon :icon="cdxIconEllipsis" />
+        </cdx-menu-button>
+      </template>
+    </cdx-table>
+
+    <div v-if="!loading && !scripts.length" class="smgr-state">
       No scripts installed yet.
     </div>
-
-    <ul v-else class="smgr-list">
-      <li v-for="(s, idx) in scripts" :key="idx" :class="['smgr-row', s.status === 'disabled' && 'smgr-row--disabled']">
-        <span :class="['smgr-stripe', s.status === 'enabled' ? 'smgr-stripe--on' : 'smgr-stripe--off']" />
-
-        <div class="smgr-row-body">
-          <div class="smgr-row-top">
-            <a :href="get_url(s.pagename, s.oldid)" target="_blank" class="smgr-pagename">
-              {{ s.pagename }}
-            </a>
-            <span v-if="updates[s.pagename]" class="smgr-update-chip">
-              <cdx-icon :icon="cdxIconAlert" />
-              Update available
-            </span>
-          </div>
-
-          <p class="smgr-meta">
-            <span
-              :class="['smgr-status-text', s.status === 'enabled' ? 'smgr-status-text--on' : 'smgr-status-text--off']">{{
-                s.status === 'enabled' ? 'Enabled' : 'Disabled' }}</span>
-            <template v-if="timestamps[s.pagename]"> · version dated <b>{{ timestamps[s.pagename] }}</b></template>
-            <template v-if="s.oldid"> (rev {{ s.oldid }})</template>
-          </p>
-        </div>
-
-        <div class="smgr-row-actions">
-          <cdx-menu-button :selected="null" :menu-items="get_menu_items(s, idx)" :disabled="busy_idx === idx"
-            :aria-label="'Actions for ' + s.pagename" @update:selected="on_select($event, idx)">
-            <cdx-icon :icon="cdxIconEllipsis" />
-          </cdx-menu-button>
-        </div>
-      </li>
-    </ul>
   </div>
 </template>
 
 <script setup>
-import { CdxButton, CdxIcon, CdxMenuButton, CdxProgressBar } from '@wikimedia/codex';
+import { computed } from 'vue';
+import { CdxButton, CdxIcon, CdxInfoChip, CdxMenuButton, CdxProgressBar, CdxTable } from '@wikimedia/codex';
 import {
-  cdxIconAdd,
-  cdxIconAlert,
-  cdxIconBlock,
-  cdxIconCheck,
-  cdxIconEllipsis,
-  cdxIconReload,
-  cdxIconTrash,
+  cdxIconAdd, cdxIconAlert, cdxIconBlock, cdxIconCheck,
+  cdxIconEllipsis, cdxIconReload, cdxIconTrash,
 } from '@wikimedia/codex-icons';
 
 const props = defineProps({
@@ -73,25 +65,20 @@ const props = defineProps({
 
 const emit = defineEmits(['toggle', 'update', 'uninstall', 'add_new']);
 
-function get_menu_items(s, idx) {
+const columns = [
+  { id: 'script', label: 'Script' },
+  { id: 'status', label: 'Status' },
+  { id: 'version', label: 'Version' },
+  { id: 'actions', label: 'Action', align: 'end' },
+];
+
+const tableData = computed(() => props.scripts.map((s, idx) => ({ ...s, _idx: idx })));
+
+function get_menu_items(row) {
   return [
-    {
-      label: 'Update',
-      value: 'update',
-      icon: cdxIconReload,
-      disabled: !props.updates[s.pagename],
-    },
-    {
-      label: s.status === 'enabled' ? 'Disable' : 'Enable',
-      value: 'toggle',
-      icon: s.status === 'enabled' ? cdxIconBlock : cdxIconCheck,
-    },
-    {
-      label: 'Remove',
-      value: 'uninstall',
-      icon: cdxIconTrash,
-      action: 'destructive',
-    },
+    { label: 'Update', value: 'update', icon: cdxIconReload, disabled: !props.updates[row.pagename] },
+    { label: row.status === 'enabled' ? 'Disable' : 'Enable', value: 'toggle', icon: row.status === 'enabled' ? cdxIconBlock : cdxIconCheck },
+    { label: 'Remove', value: 'uninstall', icon: cdxIconTrash, action: 'destructive' },
   ];
 }
 
@@ -106,132 +93,34 @@ const get_url = (pagename, oldid) => {
   return mw.util.getUrl(pagename, oldid ? { oldid } : {});
 };
 </script>
-
 <style scoped>
-.smgr-scripts-view {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.smgr-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 12px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #eaecf0;
-}
-
-.smgr-header-title {
-  font-size: 1em;
-  font-weight: 600;
-}
-
 .smgr-state {
   padding: 24px 0;
   text-align: center;
-}
-
-.smgr-empty {
   color: #72777d;
-  font-size: 0.9em;
-  font-style: italic;
 }
 
-.smgr-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.smgr-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px 10px 0;
-  border-bottom: 1px solid #eaecf0;
-  transition: background 0.1s ease;
-}
-
-.smgr-row:last-child {
-  border-bottom: none;
-}
-
-.smgr-row:hover {
-  background: #f8f9fa;
-}
-
-.skin-theme-clientpref-night .smgr-row:hover {
-  background: #1a1a1a;
-}
-
-.smgr-row--disabled .smgr-row-body {
-  opacity: 0.45;
-}
-
-.smgr-stripe {
-  flex-shrink: 0;
-  width: 3px;
-  align-self: stretch;
-  border-radius: 0 2px 2px 0;
-}
-
-.smgr-stripe--on {
-  background: #14866d;
-}
-
-.smgr-stripe--off {
-  background: #c8ccd1;
-}
-
-.smgr-row-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.smgr-row-top {
+.smgr-script-cell {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  margin-left: -12px;
+}
+
+.smgr-dimmed {
+  opacity: 0.45;
 }
 
 .smgr-pagename {
-  font-size: 0.95em;
   font-weight: 600;
   color: #0645ad;
   text-decoration: none;
-  overflow-wrap: anywhere;
 }
 
 .smgr-pagename:hover {
   text-decoration: underline;
 }
 
-.smgr-meta {
-  margin: 0;
-  font-size: 0.78em;
-  color: #72777d;
-  letter-spacing: 0.01em;
-}
-
-.smgr-status-text {
-  font-weight: 600;
-}
-
-.smgr-status-text--on {
-  color: #14866d;
-}
-
-.smgr-status-text--off {
-  color: #72777d;
-}
 
 .smgr-update-chip {
   display: inline-flex;
@@ -243,15 +132,10 @@ const get_url = (pagename, oldid) => {
   background: #eaf3fb;
   padding: 1px 6px;
   border-radius: 3px;
-  white-space: nowrap;
 }
 
 .smgr-update-chip .cdx-icon {
   width: 12px;
   height: 12px;
-}
-
-.smgr-row-actions {
-  flex-shrink: 0;
 }
 </style>

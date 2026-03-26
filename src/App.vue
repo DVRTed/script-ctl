@@ -14,7 +14,8 @@
           <span class="cdx-dialog__header__title">script-ctl</span>
           <span class="cdx-dialog__header__subtitle">A security-focused user script manager</span>
         </div>
-        <cdx_button v-if="current_view === 'list'" action="progressive" weight="primary" @click="current_view = 'install'">
+        <cdx_button v-if="current_view === 'list'" action="progressive" weight="primary"
+          @click="current_view = 'install'">
           <cdx-icon :icon="cdxIconAdd" />Add script
         </cdx_button>
       </div>
@@ -41,7 +42,7 @@
     @update:open="show_warning = $event">
     <p>
       <strong>WARNING:</strong> Userscripts could contain malicious content capable of compromising your account.
-      You are encouraged to review the source code of the script before installing it: <a
+      You are expected to review the source code of the script before installing it: <a
         :href="get_url(pending_action.name)" target="_blank"><strong>{{ pending_action.name }}</strong></a>
     </p>
     <p v-if="pending_action.type === 'install'">

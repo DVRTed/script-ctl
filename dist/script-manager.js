@@ -7,10 +7,10 @@ mw.loader.using([
 	const require = mw.loader.require;
 	(function(vue, _wikimedia_codex) {
 		//#region node_modules/@wikimedia/codex-icons/dist/codex-icons.js
-		var M = "<path d=\"M11 9V4H9v5H4v2h5v5h2v-5h5V9z\"/>", g = "<path d=\"M11.53 2.3A1.85 1.85 0 0010 1.21 1.85 1.85 0 008.48 2.3L.36 16.36C-.48 17.81.21 19 1.88 19h16.24c1.67 0 2.36-1.19 1.52-2.64zM11 16H9v-2h2zm0-4H9V6h2z\"/>", D = "<path d=\"M10 1a9 9 0 109 9 9 9 0 00-9-9m5 10H5V9h10z\"/>", v1 = "<path d=\"M7 14.17 2.83 10l-1.41 1.41L7 17 19 5l-1.41-1.42z\"/>", f1 = "<circle cx=\"10\" cy=\"10\" r=\"2\"/><circle cx=\"3\" cy=\"10\" r=\"2\"/><circle cx=\"17\" cy=\"10\" r=\"2\"/>", W2 = "<path d=\"m4 10 9 9 1.4-1.5L7 10l7.4-7.5L13 1z\"/>", _2 = "<path d=\"M15.65 4.35A8 8 0 1017.4 13h-2.22a6 6 0 11-1-7.22L11 9h7V2z\"/>", N5 = "<path d=\"M17 2h-3.5l-1-1h-5l-1 1H3v2h14zM4 17a2 2 0 002 2h8a2 2 0 002-2V5H4z\"/>", C3 = M, F3 = g, Y3 = D, n4 = v1, F4 = f1, C7 = {
+		var M = "<path d=\"M11 9V4H9v5H4v2h5v5h2v-5h5V9z\"/>", g = "<path d=\"M11.53 2.3A1.85 1.85 0 0010 1.21 1.85 1.85 0 008.48 2.3L.36 16.36C-.48 17.81.21 19 1.88 19h16.24c1.67 0 2.36-1.19 1.52-2.64zM11 16H9v-2h2zm0-4H9V6h2z\"/>", D = "<path d=\"M10 1a9 9 0 109 9 9 9 0 00-9-9m5 10H5V9h10z\"/>", v1 = "<path d=\"M7 14.17 2.83 10l-1.41 1.41L7 17 19 5l-1.41-1.42z\"/>", f1 = "<circle cx=\"10\" cy=\"10\" r=\"2\"/><circle cx=\"3\" cy=\"10\" r=\"2\"/><circle cx=\"17\" cy=\"10\" r=\"2\"/>", W2 = "<path d=\"m4 10 9 9 1.4-1.5L7 10l7.4-7.5L13 1z\"/>", _2 = "<path d=\"M15.65 4.35A8 8 0 1017.4 13h-2.22a6 6 0 11-1-7.22L11 9h7V2z\"/>", t5 = "<path d=\"M12.2 13.6a7 7 0 111.4-1.4l5.4 5.4-1.4 1.4zM3 8a5 5 0 1010 0A5 5 0 003 8\"/>", N5 = "<path d=\"M17 2h-3.5l-1-1h-5l-1 1H3v2h14zM4 17a2 2 0 002 2h8a2 2 0 002-2V5H4z\"/>", C3 = M, F3 = g, Y3 = D, n4 = v1, F4 = f1, C7 = {
 			ltr: W2,
 			shouldFlip: !0
-		}, W7 = _2, y8 = N5;
+		}, W7 = _2, P7 = t5, y8 = N5;
 		//#endregion
 		//#region src/helpers.js
 		function build_raw_url(pagename, oldid) {
@@ -77,44 +77,6 @@ mw.loader.using([
 				return [];
 			}
 		}
-		async function fetch_browse_scripts() {
-			try {
-				const page = (await new mw.Api().get({
-					action: "query",
-					prop: "revisions",
-					revids: "1344349579",
-					rvprop: "content",
-					rvslots: "main",
-					formatversion: 2
-				})).query.pages[0];
-				if (page.missing) return [];
-				const content = page.revisions[0].slots.main.content;
-				const regex = /\{\{user script table row\s*\|([^}]+)\}\}/gi;
-				const scripts = [];
-				let match;
-				while ((match = regex.exec(content)) !== null) {
-					const params = match[1].split("|");
-					const script = {};
-					for (const p of params) {
-						const idx = p.indexOf("=");
-						if (idx > -1) script[p.substring(0, idx).trim()] = p.substring(idx + 1).trim();
-					}
-					if (script.code) {
-						const user_match = script.code.match(/^User:([^\/]+)/i);
-						scripts.push({
-							name: script.name || script.code.split("/").pop(),
-							code: script.code,
-							desc: script.desc || "",
-							doc: script.doc || script.code,
-							user: user_match ? user_match[1] : ""
-						});
-					}
-				}
-				return scripts;
-			} catch (e) {
-				return [];
-			}
-		}
 		//#endregion
 		//#region \0plugin-vue:export-helper
 		var _plugin_vue_export_helper_default = (sfc, props) => {
@@ -127,29 +89,7 @@ mw.loader.using([
 		var _hoisted_1$2 = { class: "smgr-install-view" };
 		var _hoisted_2$2 = { class: "smgr-card smgr-install-card" };
 		var _hoisted_3$2 = { class: "smgr-install-row" };
-		var _hoisted_4$2 = { class: "smgr-card smgr-examples-card" };
-		var _hoisted_5$2 = { class: "smgr-examples-title" };
-		var _hoisted_6$2 = ["href"];
-		var _hoisted_7$1 = {
-			key: 0,
-			class: "smgr-browse-loading"
-		};
-		var _hoisted_8$1 = {
-			key: 1,
-			class: "smgr-browse-list-container"
-		};
-		var _hoisted_9$1 = { class: "smgr-example-list" };
-		var _hoisted_10 = { class: "smgr-browse-info" };
-		var _hoisted_11 = ["href"];
-		var _hoisted_12 = {
-			key: 0,
-			class: "smgr-browse-author"
-		};
-		var _hoisted_13 = ["href"];
-		var _hoisted_14 = {
-			key: 0,
-			class: "smgr-browse-desc"
-		};
+		var _hoisted_4$2 = { class: "smgr-browse-footer" };
 		var InstallForm_default = /* @__PURE__ */ _plugin_vue_export_helper_default({
 			__name: "InstallForm",
 			props: { busy: {
@@ -163,20 +103,12 @@ mw.loader.using([
 				const install_input = (0, vue.ref)("");
 				const selected_script = (0, vue.ref)(null);
 				const suggestions = (0, vue.ref)([]);
-				const browse_scripts = (0, vue.ref)([]);
-				const loading_browse = (0, vue.ref)(false);
 				let timeout = null;
 				const menu_items = (0, vue.computed)(() => {
 					return suggestions.value.map((s) => ({
 						value: s,
 						label: s
 					}));
-				});
-				const get_url = (pagename) => mw.util.getUrl(pagename);
-				(0, vue.onMounted)(async () => {
-					loading_browse.value = true;
-					browse_scripts.value = await fetch_browse_scripts();
-					loading_browse.value = false;
 				});
 				const on_input = (val) => {
 					if (timeout) clearTimeout(timeout);
@@ -193,10 +125,8 @@ mw.loader.using([
 					const val = selected_script.value || install_input.value;
 					if (val) emit("install", typeof val === "string" ? val : val.value);
 				};
-				const install_from_list = (name) => {
-					if (props.busy) return;
-					install_input.value = name;
-					emit("install", name);
+				const open_browse = () => {
+					window.open(mw.util.getUrl("Wikipedia:User scripts/List"), "_blank");
 				};
 				__expose({ clear_input: () => {
 					install_input.value = "";
@@ -204,58 +134,45 @@ mw.loader.using([
 					suggestions.value = [];
 				} });
 				return (_ctx, _cache) => {
-					return (0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_1$2, [(0, vue.createElementVNode)("div", _hoisted_2$2, [_cache[2] || (_cache[2] = (0, vue.createElementVNode)("label", { class: "smgr-label" }, "Script Page Name", -1)), (0, vue.createElementVNode)("div", _hoisted_3$2, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxLookup), {
-						selected: selected_script.value,
-						"onUpdate:selected": _cache[0] || (_cache[0] = ($event) => selected_script.value = $event),
-						"input-value": install_input.value,
-						"onUpdate:inputValue": _cache[1] || (_cache[1] = ($event) => install_input.value = $event),
-						placeholder: "User:Foo/bar.js",
-						class: "smgr-input",
-						"menu-items": menu_items.value,
-						onInput: on_input,
-						disabled: __props.busy,
-						onKeyup: (0, vue.withKeys)(submit, ["enter"])
-					}, null, 8, [
-						"selected",
-						"input-value",
-						"menu-items",
-						"disabled"
-					]), (0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxButton), {
-						action: "progressive",
-						weight: "primary",
-						onClick: submit,
-						disabled: __props.busy
-					}, {
-						default: (0, vue.withCtx)(() => [(0, vue.createTextVNode)((0, vue.toDisplayString)(__props.busy ? "Installing..." : "Install"), 1)]),
-						_: 1
-					}, 8, ["disabled"])])]), (0, vue.createElementVNode)("div", _hoisted_4$2, [(0, vue.createElementVNode)("h4", _hoisted_5$2, [
-						_cache[3] || (_cache[3] = (0, vue.createTextVNode)("Browse Scripts (from ", -1)),
-						(0, vue.createElementVNode)("a", {
-							href: get_url("Wikipedia:User scripts/List"),
-							target: "_blank"
-						}, "Wikipedia:User scripts/List", 8, _hoisted_6$2),
-						_cache[4] || (_cache[4] = (0, vue.createTextVNode)(")", -1))
-					]), loading_browse.value ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_7$1, "Loading scripts...")) : ((0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_8$1, [(0, vue.createElementVNode)("ul", _hoisted_9$1, [((0, vue.openBlock)(true), (0, vue.createElementBlock)(vue.Fragment, null, (0, vue.renderList)(browse_scripts.value, (s) => {
-						return (0, vue.openBlock)(), (0, vue.createElementBlock)("li", {
-							key: s.code,
-							class: "smgr-browse-item"
-						}, [(0, vue.createElementVNode)("div", _hoisted_10, [(0, vue.createElementVNode)("strong", null, [(0, vue.createElementVNode)("a", {
-							href: get_url(s.doc),
-							target: "_blank"
-						}, (0, vue.toDisplayString)(s.name), 9, _hoisted_11), s.user ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("span", _hoisted_12, [_cache[5] || (_cache[5] = (0, vue.createTextVNode)(" by ", -1)), (0, vue.createElementVNode)("a", {
-							href: get_url("User:" + s.user),
-							target: "_blank"
-						}, (0, vue.toDisplayString)(s.user), 9, _hoisted_13)])) : (0, vue.createCommentVNode)("", true)]), s.desc ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_14, (0, vue.toDisplayString)(s.desc), 1)) : (0, vue.createCommentVNode)("", true)]), (0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxButton), {
-							class: "smgr-install-btn",
-							onClick: ($event) => install_from_list(s.code)
+					return (0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_1$2, [(0, vue.createElementVNode)("div", _hoisted_2$2, [
+						_cache[3] || (_cache[3] = (0, vue.createElementVNode)("label", { class: "smgr-label" }, "Script Page Name", -1)),
+						(0, vue.createElementVNode)("div", _hoisted_3$2, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxLookup), {
+							selected: selected_script.value,
+							"onUpdate:selected": _cache[0] || (_cache[0] = ($event) => selected_script.value = $event),
+							"input-value": install_input.value,
+							"onUpdate:inputValue": _cache[1] || (_cache[1] = ($event) => install_input.value = $event),
+							placeholder: "User:Foo/bar.js",
+							class: "smgr-input",
+							"menu-items": menu_items.value,
+							onInput: on_input,
+							disabled: __props.busy,
+							onKeyup: (0, vue.withKeys)(submit, ["enter"])
+						}, null, 8, [
+							"selected",
+							"input-value",
+							"menu-items",
+							"disabled"
+						]), (0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxButton), {
+							action: "progressive",
+							weight: "primary",
+							onClick: submit,
+							disabled: __props.busy
 						}, {
-							default: (0, vue.withCtx)(() => [..._cache[6] || (_cache[6] = [(0, vue.createTextVNode)("Install", -1)])]),
+							default: (0, vue.withCtx)(() => [(0, vue.createTextVNode)((0, vue.toDisplayString)(__props.busy ? "Installing..." : "Install"), 1)]),
 							_: 1
-						}, 8, ["onClick"])]);
-					}), 128))])]))])]);
+						}, 8, ["disabled"])]),
+						(0, vue.createElementVNode)("div", _hoisted_4$2, [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxButton), {
+							weight: "quiet",
+							action: "progressive",
+							onClick: open_browse
+						}, {
+							default: (0, vue.withCtx)(() => [(0, vue.createVNode)((0, vue.unref)(_wikimedia_codex.CdxIcon), { icon: (0, vue.unref)(P7) }, null, 8, ["icon"]), _cache[2] || (_cache[2] = (0, vue.createTextVNode)("Browse community userscripts ", -1))]),
+							_: 1
+						})])
+					])]);
 				};
 			}
-		}, [["__scopeId", "data-v-0274e93e"]]);
+		}, [["__scopeId", "data-v-f6574ed7"]]);
 		//#endregion
 		//#region src/components/ScriptList.vue
 		var _hoisted_1$1 = { class: "smgr-scripts-view" };
@@ -818,7 +735,7 @@ mw.loader.using([
 	try {
 		if (typeof document != "undefined") {
 			var elementStyle = document.createElement("style");
-			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-0274e93e] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-0274e93e] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-0274e93e] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-0274e93e] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-0274e93e] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-0274e93e] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-0274e93e] {\n  flex: 1;\n}\n.smgr-examples-card[data-v-0274e93e] {\n  background: #f8f9fa;\n  border-color: #eaecf0;\n  display: flex;\n  flex-direction: column;\n}\n.skin-theme-clientpref-night .smgr-examples-card[data-v-0274e93e] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-examples-title[data-v-0274e93e] {\n  margin: 0 0 10px 0;\n  font-size: 0.95em;\n}\n.smgr-browse-loading[data-v-0274e93e] {\n  font-size: 0.9em;\n  color: #72777d;\n  font-style: italic;\n  padding: 10px 0;\n}\n.smgr-browse-list-container[data-v-0274e93e] {\n  height: 250px;\n  overflow-y: auto;\n  border: 1px solid #eaecf0;\n  border-radius: 4px;\n  background: #fff;\n}\n.skin-theme-clientpref-night .smgr-browse-list-container[data-v-0274e93e] {\n  background: #141414;\n  border-color: #54595d;\n}\n.smgr-example-list[data-v-0274e93e] {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n}\n.smgr-browse-item[data-v-0274e93e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 10px 12px;\n  border-bottom: 1px solid #eaecf0;\n  gap: 12px;\n}\n.smgr-browse-item[data-v-0274e93e]:last-child {\n  border-bottom: none;\n}\n.smgr-browse-item[data-v-0274e93e]:hover {\n  background: #f8f9fa;\n}\n.skin-theme-clientpref-night .smgr-browse-item[data-v-0274e93e]:hover {\n  background: #1a1a1a;\n}\n.smgr-browse-info[data-v-0274e93e] {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n}\n.smgr-browse-info strong[data-v-0274e93e] {\n  font-size: 0.95em;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.smgr-browse-info strong a[data-v-0274e93e] {\n  color: #0645ad;\n  text-decoration: none;\n}\n.skin-theme-clientpref-night .smgr-browse-info strong a[data-v-0274e93e] {\n  color: #4e94ce;\n}\n.smgr-browse-info strong a[data-v-0274e93e]:hover {\n  text-decoration: underline;\n}\n.smgr-browse-author[data-v-0274e93e] {\n  font-size: 0.9em;\n  font-weight: normal;\n}\n.smgr-browse-desc[data-v-0274e93e] {\n  font-size: 0.85em;\n  line-height: 1.3;\n}\n.smgr-install-btn[data-v-0274e93e] {\n  flex-shrink: 0;\n}\n\n.smgr-state[data-v-1b27191a] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: #72777d;\n}\n.smgr-script-cell[data-v-1b27191a] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-1b27191a] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-1b27191a] {\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-1b27191a]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-1b27191a] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-1b27191a] {\r\n  width: 12px;\r\n  height: 12px;\n}\r\n\n.smgr-body[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-9d8d6d44] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-9d8d6d44] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-9d8d6d44] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-9d8d6d44] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-9d8d6d44] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-9d8d6d44] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
+			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-f6574ed7] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-f6574ed7] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-f6574ed7] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-f6574ed7] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-f6574ed7] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-f6574ed7] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-f6574ed7] {\n  flex: 1;\n}\n.smgr-browse-footer[data-v-f6574ed7] {\n  margin-top: 4px;\n  display: flex;\n  justify-content: flex-start;\n}\n\n.smgr-state[data-v-1b27191a] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: #72777d;\n}\n.smgr-script-cell[data-v-1b27191a] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-1b27191a] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-1b27191a] {\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-1b27191a]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-1b27191a] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-1b27191a] {\r\n  width: 12px;\r\n  height: 12px;\n}\r\n\n.smgr-body[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-9d8d6d44] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-9d8d6d44] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-9d8d6d44] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-9d8d6d44] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-9d8d6d44] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-9d8d6d44] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-9d8d6d44] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-9d8d6d44] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
 			document.head.appendChild(elementStyle);
 		}
 	} catch (e) {

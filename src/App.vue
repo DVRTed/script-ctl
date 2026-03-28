@@ -1,5 +1,6 @@
 <template>
-  <cdx_dialog v-model:open="is_open" class="smgr-dialog" close-button-label="Close" @update:open="on_dialog_update">
+  <cdx_dialog v-model:open="is_open" class="smgr-dialog" close-button-label="Close" :use-close-button="true"
+    @update:open="on_dialog_update">
     <template #header>
       <div class="smgr-header-content" :class="{ 'smgr-header-content--install': current_view === 'install' }">
         <div v-if="current_view === 'install'" class="smgr-header-nav">
@@ -14,10 +15,15 @@
           <span class="cdx-dialog__header__title">script-ctl</span>
           <span class="cdx-dialog__header__subtitle">A security-focused user script manager</span>
         </div>
-        <cdx_button v-if="current_view === 'list'" action="progressive" weight="primary"
-          @click="current_view = 'install'">
-          <cdx-icon :icon="cdxIconAdd" />Add script
-        </cdx_button>
+        <div class="smgr-header-actions">
+          <cdx_button v-if="current_view === 'list'" action="progressive" weight="primary"
+            @click="current_view = 'install'">
+            <cdx-icon :icon="cdxIconAdd" />Add script
+          </cdx_button>
+          <cdx_button weight="quiet" @click="is_open = false" aria-label="Close">
+            <cdx-icon :icon="cdxIconClose" />Close
+          </cdx_button>
+        </div>
       </div>
     </template>
     <div class="smgr-body">
@@ -64,7 +70,7 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import { CdxDialog as cdx_dialog, CdxButton as cdx_button, CdxIcon } from '@wikimedia/codex';
-import { cdxIconAdd, cdxIconPrevious } from '@wikimedia/codex-icons';
+import { cdxIconAdd, cdxIconPrevious, cdxIconClose } from '@wikimedia/codex-icons';
 
 import install_form from './components/InstallForm.vue';
 import script_list from './components/ScriptList.vue';
@@ -335,6 +341,12 @@ const on_uninstall = async (idx) => {
 .smgr-header-text {
   display: flex;
   flex-direction: column;
+}
+
+.smgr-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .smgr-header-content--install .cdx-dialog__header__title {

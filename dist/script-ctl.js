@@ -367,7 +367,7 @@ mw.loader.using([
 				const old_content = page.missing ? "" : page.revisions[0].slots.main.content;
 				const block = `/* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!*/\n[\n${list.map((item) => {
 					return `\t// backlink: [[${item.pagename}]]\n\t${JSON.stringify(item)}`;
-				}).join(",\n")}\n]\n/* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!*/`;
+				}).join(",\n\n")}\n]\n/* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!*/`;
 				const new_content = old_content.match(BLOCK_RE) ? old_content.replace(BLOCK_RE, block) : old_content + (old_content ? "\n\n" : "") + block;
 				return api.postWithToken("csrf", {
 					action: "edit",

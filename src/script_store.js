@@ -47,7 +47,7 @@ export const script_store = {
       .map((item) => {
         return `\t// backlink: [[${item.pagename}]]\n\t${JSON.stringify(item)}`;
       })
-      .join(",\n");
+      .join(",\n\n");
     const block = BLOCK_START + `\n[\n${items}\n]\n` + BLOCK_END;
     const new_content = old_content.match(BLOCK_RE)
       ? old_content.replace(BLOCK_RE, block)

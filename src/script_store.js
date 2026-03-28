@@ -42,11 +42,13 @@ export const script_store = {
     const old_content = page.missing
       ? ""
       : page.revisions[0].slots.main.content;
-    const backlinks = list.map((item) => `[[${item.pagename}]]`).join(", ");
-    const block =
-      BLOCK_START +
-      `\n// Backlinks: ${backlinks}\n${JSON.stringify(list, null, "\t")}\n` +
-      BLOCK_END;
+
+    const items = list
+      .map((item) => {
+        return `\t// backlink: [[${item.pagename}]]\n\t${JSON.stringify(item)}`;
+      })
+      .join(",\n");
+    const block = BLOCK_START + `\n[\n${items}\n]\n` + BLOCK_END;
     const new_content = old_content.match(BLOCK_RE)
       ? old_content.replace(BLOCK_RE, block)
       : old_content + (old_content ? "\n\n" : "") + block;

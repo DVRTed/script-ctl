@@ -365,27 +365,27 @@ const on_uninstall = async (idx) => {
 }
 
 .smgr-notice--success {
-  background: #f0fdf4;
-  border-color: #22c55e;
-  color: #15803d;
+  background: var(--background-color-success-subtle, #d5fdf4);
+  border-color: var(--border-color-success, #096450);
+  color: var(--color-success, #14866d);
 }
 
 .smgr-notice--error {
-  background: #fef2f2;
-  border-color: #ef4444;
-  color: #b91c1c;
+  background: var(--background-color-error-subtle, #fee7e6);
+  border-color: var(--border-color-error, #b32424);
+  color: var(--color-error, #d73333);
 }
 
 .smgr-notice--warning {
-  background: #fffbeb;
-  border-color: #f59e0b;
-  color: #b45309;
+  background: var(--background-color-warning-subtle, #fef6e7);
+  border-color: var(--border-color-warning, #a66200);
+  color: var(--border-color-warning, #a66200);
 }
 
 .smgr-notice--notice {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  color: #1d4ed8;
+  background: var(--background-color-notice-subtle, #eaecf0);
+  border-color: var(--border-color-notice, #54595d);
+  color: var(--color-notice, #202122);
 }
 </style>
 

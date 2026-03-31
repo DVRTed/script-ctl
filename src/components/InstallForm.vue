@@ -86,15 +86,10 @@ defineExpose({
 }
 
 .smgr-card {
-  background: #fff;
-  border: 1px solid #c8ccd1;
+  background: var(--background-color-base, #fff);
+  border: 1px solid var(--border-color-subtle, #c8ccd1);
   border-radius: 4px;
   padding: 16px;
-}
-
-.skin-theme-clientpref-night .smgr-card {
-  background: #202122;
-  border-color: #54595d;
 }
 
 .smgr-install-card {
@@ -119,7 +114,5 @@ defineExpose({
 
 .smgr-browse-footer {
   margin-top: 4px;
-  display: flex;
-  justify-content: flex-start;
 }
 </style>

@@ -5,8 +5,6 @@
     </div>
 
     <cdx-table v-else caption="Installed scripts" :columns="columns" :data="tableData">
-
-
       <template #item-script="{ row }">
         <div :class="['smgr-script-cell', { 'smgr-dimmed': row.status === 'disabled' }]">
           <span :class="['smgr-stripe', row.status === 'enabled' ? 'smgr-stripe--on' : 'smgr-stripe--off']" />
@@ -23,14 +21,13 @@
         <cdx-info-chip :status="row.status === 'enabled' ? 'success' : 'warning'">
           {{ row.status === 'enabled' ? 'Enabled' : 'Disabled' }}
         </cdx-info-chip>
-
       </template>
 
       <template #item-version="{ row }">
         <template v-if="timestamps[row.pagename]">
           {{ timestamps[row.pagename] }}<template v-if="row.oldid"> (rev {{ row.oldid }})</template>
         </template>
-        <span v-else style="color: #72777d">—</span>
+        <span v-else class="smgr-empty">—</span>
       </template>
 
       <template #item-actions="{ row }">
@@ -93,11 +90,12 @@ const get_url = (pagename, oldid) => {
   return mw.util.getUrl(pagename, oldid ? { oldid } : {});
 };
 </script>
+
 <style scoped>
 .smgr-state {
   padding: 24px 0;
   text-align: center;
-  color: #72777d;
+  color: var(--color-placeholder, #72777d);
 }
 
 .smgr-script-cell {
@@ -113,7 +111,7 @@ const get_url = (pagename, oldid) => {
 
 .smgr-pagename {
   font-weight: 600;
-  color: #0645ad;
+  color: var(--color-progressive, #36c);
   text-decoration: none;
 }
 
@@ -121,15 +119,14 @@ const get_url = (pagename, oldid) => {
   text-decoration: underline;
 }
 
-
 .smgr-update-chip {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   font-size: 0.72em;
   font-weight: 600;
-  color: #3366cc;
-  background: #eaf3fb;
+  color: var(--color-progressive, #36c);
+  background: var(--background-color-progressive-subtle, #eaf3ff);
   padding: 1px 6px;
   border-radius: 3px;
 }
@@ -137,5 +134,9 @@ const get_url = (pagename, oldid) => {
 .smgr-update-chip .cdx-icon {
   width: 12px;
   height: 12px;
+}
+
+.smgr-empty {
+  color: var(--color-placeholder, #72777d);
 }
 </style>

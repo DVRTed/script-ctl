@@ -178,7 +178,7 @@ mw.loader.using([
 					])]);
 				};
 			}
-		}, [["__scopeId", "data-v-c419cbd9"]]);
+		}, [["__scopeId", "data-v-05e069a8"]]);
 		//#endregion
 		//#region src/components/ScriptList.vue
 		var _hoisted_1$1 = { class: "smgr-scripts-view" };
@@ -193,7 +193,7 @@ mw.loader.using([
 		};
 		var _hoisted_5$1 = {
 			key: 1,
-			style: { "color": "#72777d" }
+			class: "smgr-empty"
 		};
 		var _hoisted_6$1 = {
 			key: 2,
@@ -328,7 +328,7 @@ mw.loader.using([
 					}, 8, ["data"])), !__props.loading && !__props.scripts.length ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("div", _hoisted_6$1, " No scripts installed yet. ")) : (0, vue.createCommentVNode)("", true)]);
 				};
 			}
-		}, [["__scopeId", "data-v-1b27191a"]]);
+		}, [["__scopeId", "data-v-a4a057da"]]);
 		//#endregion
 		//#region src/script_store.js
 		var BLOCK_RE = /\/\* scriptmanager:begin !DO NOT EDIT THIS LINE MANUALLY!\*\/([\s\S]*?)\/\* scriptmanager:end !DO NOT EDIT THIS LINE MANUALLY!\*\//;
@@ -741,7 +741,7 @@ mw.loader.using([
 					}, 8, ["open"])], 64);
 				};
 			}
-		}, [["__scopeId", "data-v-bafc0596"]]);
+		}, [["__scopeId", "data-v-dda5ad58"]]);
 		//#endregion
 		//#region src/init.js
 		async function init() {
@@ -788,7 +788,7 @@ mw.loader.using([
 	try {
 		if (typeof document != "undefined") {
 			var elementStyle = document.createElement("style");
-			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-c419cbd9] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-c419cbd9] {\n  background: #fff;\n  border: 1px solid #c8ccd1;\n  border-radius: 4px;\n  padding: 16px;\n}\n.skin-theme-clientpref-night .smgr-card[data-v-c419cbd9] {\n  background: #202122;\n  border-color: #54595d;\n}\n.smgr-install-card[data-v-c419cbd9] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-c419cbd9] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-c419cbd9] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-c419cbd9] {\n  flex: 1;\n}\n.smgr-browse-footer[data-v-c419cbd9] {\n  margin-top: 4px;\n  display: flex;\n  justify-content: flex-start;\n}\n\n.smgr-state[data-v-1b27191a] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: #72777d;\n}\n.smgr-script-cell[data-v-1b27191a] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-1b27191a] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-1b27191a] {\r\n  font-weight: 600;\r\n  color: #0645ad;\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-1b27191a]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-1b27191a] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: #3366cc;\r\n  background: #eaf3fb;\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-1b27191a] {\r\n  width: 12px;\r\n  height: 12px;\n}\r\n\n.smgr-body[data-v-bafc0596] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-bafc0596] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-bafc0596] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-bafc0596] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-actions[data-v-bafc0596] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-bafc0596] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-bafc0596] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-bafc0596] {\r\n  background: #f0fdf4;\r\n  border-color: #22c55e;\r\n  color: #15803d;\n}\n.smgr-notice--error[data-v-bafc0596] {\r\n  background: #fef2f2;\r\n  border-color: #ef4444;\r\n  color: #b91c1c;\n}\n.smgr-notice--warning[data-v-bafc0596] {\r\n  background: #fffbeb;\r\n  border-color: #f59e0b;\r\n  color: #b45309;\n}\n.smgr-notice--notice[data-v-bafc0596] {\r\n  background: #eff6ff;\r\n  border-color: #3b82f6;\r\n  color: #1d4ed8;\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
+			elementStyle.appendChild(document.createTextNode(".smgr-install-view[data-v-05e069a8] {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n.smgr-card[data-v-05e069a8] {\n  background: var(--background-color-base, #fff);\n  border: 1px solid var(--border-color-subtle, #c8ccd1);\n  border-radius: 4px;\n  padding: 16px;\n}\n.smgr-install-card[data-v-05e069a8] {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n.smgr-label[data-v-05e069a8] {\n  font-weight: bold;\n  font-size: 0.9em;\n}\n.smgr-install-row[data-v-05e069a8] {\n  display: flex;\n  gap: 10px;\n}\n.smgr-input[data-v-05e069a8] {\n  flex: 1;\n}\n.smgr-browse-footer[data-v-05e069a8] {\n  margin-top: 4px;\n}\n\n.smgr-state[data-v-a4a057da] {\r\n  padding: 24px 0;\r\n  text-align: center;\r\n  color: var(--color-placeholder, #72777d);\n}\n.smgr-script-cell[data-v-a4a057da] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -12px;\n}\n.smgr-dimmed[data-v-a4a057da] {\r\n  opacity: 0.45;\n}\n.smgr-pagename[data-v-a4a057da] {\r\n  font-weight: 600;\r\n  color: var(--color-progressive, #36c);\r\n  text-decoration: none;\n}\n.smgr-pagename[data-v-a4a057da]:hover {\r\n  text-decoration: underline;\n}\n.smgr-update-chip[data-v-a4a057da] {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n  font-size: 0.72em;\r\n  font-weight: 600;\r\n  color: var(--color-progressive, #36c);\r\n  background: var(--background-color-progressive-subtle, #eaf3ff);\r\n  padding: 1px 6px;\r\n  border-radius: 3px;\n}\n.smgr-update-chip .cdx-icon[data-v-a4a057da] {\r\n  width: 12px;\r\n  height: 12px;\n}\n.smgr-empty[data-v-a4a057da] {\r\n  color: var(--color-placeholder, #72777d);\n}\r\n\n.smgr-body[data-v-dda5ad58] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 20px;\n}\n.smgr-header-content[data-v-dda5ad58] {\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n  width: 100%;\n}\n.smgr-header-nav[data-v-dda5ad58] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  margin-left: -8px;\n}\n.smgr-header-text[data-v-dda5ad58] {\r\n  display: flex;\r\n  flex-direction: column;\n}\n.smgr-header-actions[data-v-dda5ad58] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\n}\n.smgr-header-content--install .cdx-dialog__header__title[data-v-dda5ad58] {\r\n  font-size: 1rem;\n}\n.smgr-notice[data-v-dda5ad58] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 10px 14px;\r\n  border-radius: 4px;\r\n  border-left: 4px solid;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.smgr-notice--success[data-v-dda5ad58] {\r\n  background: var(--background-color-success-subtle, #d5fdf4);\r\n  border-color: var(--border-color-success, #096450);\r\n  color: var(--color-success, #14866d);\n}\n.smgr-notice--error[data-v-dda5ad58] {\r\n  background: var(--background-color-error-subtle, #fee7e6);\r\n  border-color: var(--border-color-error, #b32424);\r\n  color: var(--color-error, #d73333);\n}\n.smgr-notice--warning[data-v-dda5ad58] {\r\n  background: var(--background-color-warning-subtle, #fef6e7);\r\n  border-color: var(--border-color-warning, #a66200);\r\n  color: var(--border-color-warning, #a66200);\n}\n.smgr-notice--notice[data-v-dda5ad58] {\r\n  background: var(--background-color-notice-subtle, #eaecf0);\r\n  border-color: var(--border-color-notice, #54595d);\r\n  color: var(--color-notice, #202122);\n}\r\n\n.smgr-dialog.cdx-dialog__window,\r\n.smgr-dialog .cdx-dialog__window,\r\n.smgr-dialog {\r\n  width: 800px !important;\r\n  max-width: 90vw !important;\n}\r\n/*$vite$:1*/"));
 			document.head.appendChild(elementStyle);
 		}
 	} catch (e) {

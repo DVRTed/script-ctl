@@ -1,13 +1,19 @@
 script manager:
-  ✔ finish a just werks version w vite build @done
-  ✔ ensure the content model is JavaScript @critical @done
-  ✔ reuse the WARNNG prompt for when upgrading script @done
-  ✔ hardcode oldid for US/L or copy it to userspace and protect it or copy it to userspace .js? @high @done
-  ✔ show "last modified" in installed scripts @done
-  ✔ explicit height in install scripts section @done
-  ✔ better edit summaries @high @done(26-03-23 09:11)
-  ☐ install this script button in .js pages @high
-  ☐ create README @low
-  ☐ install this script button in docs? @low
-  ☐ search option in Browse Scripts section @low
-  ✔ normalize page name before saving @low @done
+  finished:
+    ✔ finish a just werks version w vite build @done
+    ✔ ensure the content model is JavaScript @critical @done
+    ✔ reuse the WARNNG prompt for when upgrading script @done
+    ✔ hardcode oldid for US/L or copy it to userspace and protect it or copy it to userspace .js? @high @done
+    ✔ show "last modified" in installed scripts @done
+    ✔ explicit height in install scripts section @done
+    ✔ better edit summaries @high @done(26-03-23 09:11)
+    ✔ normalize page name before saving @low @done
+
+  cancelled:
+    ✘ search option in Browse Scripts section @cancelled(26-03-31 11:34)
+
+  todo:
+    ☐ install this script button in .js pages @high
+    ☐ install this script button in docs? @high
+    ☐ hide table when theres no scripts @low
+    ☐ create README @low
